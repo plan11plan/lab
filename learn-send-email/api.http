@@ -1,0 +1,9 @@
+### 이메일 발송
+POST http://localhost:8080/email/send
+Content-Type: application/json
+
+{
+  "to": "receiver@example.com",
+  "subject": "테스트 이메일",
+  "body": "Spring Boot에서 발송한 테스트 이메일입니다."
+}
