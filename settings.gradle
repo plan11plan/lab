@@ -1,3 +1,4 @@
 rootProject.name = 'lab'
 
 include 'learn-send-email'
+include 'learn-kafka'
