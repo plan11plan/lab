@@ -1,4 +1,4 @@
-package lab;
+package lab.test;
 
 import jakarta.persistence.*;
 import lombok.Getter;

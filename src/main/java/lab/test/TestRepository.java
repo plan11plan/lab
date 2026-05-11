@@ -1,4 +1,4 @@
-package lab;
+package lab.test;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

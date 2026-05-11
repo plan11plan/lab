@@ -1,4 +1,4 @@
-package lab;
+package lab.test;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
