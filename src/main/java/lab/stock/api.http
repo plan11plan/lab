@@ -1,0 +1,112 @@
+### 생성
+POST http://localhost:8080/test?name=hello
+
+###
+
+### 생성
+POST http://localhost:8080/test?name=world
+
+###
+
+### 전체 조회
+GET http://localhost:8080/test
+
+###
+
+### 삭제
+DELETE http://localhost:8080/test/1
+
+###
+
+### 삭제 후 조회
+GET http://localhost:8080/test
+
+
+###################################################
+# Stock concurrency lab — SERIALIZABLE 컬럼
+# 사용법: 각 시나리오의 -A 를 먼저 보낸 뒤 2초 이내에 -B 를 보낼 것.
+# 시나리오 사이마다 앱 재시작(시더 재실행)으로 상태 초기화.
+###################################################
+
+### S1-SER-A  Write-Write : A UPDATE then sleep 5s
+POST http://localhost:8080/serializable/update-sleep?tag=A&id=1&delta=1&sleep=5000
+
+### S1-SER-B  Write-Write : B UPDATE (블록 예상)
+POST http://localhost:8080/serializable/update?tag=B&id=1&delta=2
+
+### S2-SER-A  Write-PlainSelect : A UPDATE then sleep
+POST http://localhost:8080/serializable/update-sleep?tag=A&id=1&delta=1&sleep=5000
+
+### S2-SER-B  Write-PlainSelect : B plain SELECT (블록 예상)
+GET http://localhost:8080/serializable/select?tag=B&id=1
+
+### S3-SER-A  Write-SelectForUpdate : A UPDATE then sleep
+POST http://localhost:8080/serializable/update-sleep?tag=A&id=1&delta=1&sleep=5000
+
+### S3-SER-B  Write-SelectForUpdate : B SELECT FOR UPDATE (블록 예상)
+GET http://localhost:8080/serializable/select-for-update?tag=B&id=1
+
+### S4-SER-A  PlainSelect-Write : A plain SELECT then sleep
+GET http://localhost:8080/serializable/select-sleep?tag=A&id=1&sleep=5000
+
+### S4-SER-B  PlainSelect-Write : B UPDATE (블록 예상)
+POST http://localhost:8080/serializable/update?tag=B&id=1&delta=1
+
+### S5-SER-A  Read-Read : A plain SELECT then sleep
+GET http://localhost:8080/serializable/select-sleep?tag=A&id=1&sleep=5000
+
+### S5-SER-B  Read-Read : B plain SELECT (즉시 응답 예상)
+GET http://localhost:8080/serializable/select?tag=B&id=1
+
+### S6-SER-A  RangeSelect-Insert : A range SELECT then sleep
+GET http://localhost:8080/serializable/range-select-sleep?tag=A&lo=40&hi=160&sleep=5000
+
+### S6-SER-B  RangeSelect-Insert : B INSERT (gap lock으로 블록 예상)
+POST http://localhost:8080/serializable/insert?tag=B&quantity=120
+
+
+###################################################
+# Stock concurrency lab — PESSIMISTIC_WRITE 컬럼
+###################################################
+
+### S1-PESS-A  Write-Write : A UPDATE(잠금) then sleep
+POST http://localhost:8080/pessimistic/update-sleep?tag=A&id=1&delta=1&sleep=5000
+
+### S1-PESS-B  Write-Write : B UPDATE (블록 예상)
+POST http://localhost:8080/pessimistic/update?tag=B&id=1&delta=2
+
+### S2-PESS-A  Write-PlainSelect : A UPDATE then sleep
+POST http://localhost:8080/pessimistic/update-sleep?tag=A&id=1&delta=1&sleep=5000
+
+### S2-PESS-B  Write-PlainSelect : B plain SELECT (즉시 응답, snapshot=100 예상)
+GET http://localhost:8080/pessimistic/select?tag=B&id=1
+
+### S3-PESS-A  Write-SelectForUpdate : A UPDATE then sleep
+POST http://localhost:8080/pessimistic/update-sleep?tag=A&id=1&delta=1&sleep=5000
+
+### S3-PESS-B  Write-SelectForUpdate : B SELECT FOR UPDATE (블록 예상)
+GET http://localhost:8080/pessimistic/select-for-update?tag=B&id=1
+
+### S4-PESS-A  PlainSelect-Write : A plain SELECT then sleep (락 없음)
+GET http://localhost:8080/pessimistic/select-sleep?tag=A&id=1&sleep=5000
+
+### S4-PESS-B  PlainSelect-Write : B UPDATE (즉시 응답 예상)
+POST http://localhost:8080/pessimistic/update?tag=B&id=1&delta=1
+
+### S5-PESS-A  Read-Read : A plain SELECT then sleep
+GET http://localhost:8080/pessimistic/select-sleep?tag=A&id=1&sleep=5000
+
+### S5-PESS-B  Read-Read : B plain SELECT (즉시 응답 예상)
+GET http://localhost:8080/pessimistic/select?tag=B&id=1
+
+### S6-PESS-row-A  단일 row PESSIMISTIC_WRITE 잠금 then sleep
+POST http://localhost:8080/pessimistic/lock-single-sleep?tag=A&id=1&sleep=5000
+
+### S6-PESS-row-B  새 row INSERT (즉시 성공 예상 — phantom 시연 결정타)
+POST http://localhost:8080/pessimistic/insert?tag=B&quantity=120
+
+### S6-PESS-range-A  range SELECT FOR UPDATE then sleep
+GET http://localhost:8080/pessimistic/range-select-sleep?tag=A&lo=40&hi=160&sleep=5000
+
+### S6-PESS-range-B  새 row INSERT (gap 락에 막혀 블록될 가능성)
+POST http://localhost:8080/pessimistic/insert?tag=B&quantity=120
