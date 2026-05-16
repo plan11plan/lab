@@ -31,6 +31,10 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+	testImplementation platform('org.testcontainers:testcontainers-bom:1.20.4')
+	testImplementation 'org.testcontainers:junit-jupiter'
+	testImplementation 'org.testcontainers:mysql'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
